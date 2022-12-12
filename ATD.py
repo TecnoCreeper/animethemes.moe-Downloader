@@ -1,4 +1,4 @@
-""" animethemes.moe CLI downloader
+"""animethemes.moe CLI downloader
 
 Download modes: - video(with audio) - only audio
 API: https://api-docs.animethemes.moe/
@@ -99,7 +99,7 @@ def display_videos(videos: dict[int, dict[str, str]]) -> tuple[str, str]:
     return link_to_download, file_name
 
 
-def downloader(link, name):
+def downloader(link: str, name: str) -> None:
     """Download the selected link."""
     extension = link.split(".")[-1]
     response = requests.get(link, stream=True, timeout=REQUEST_TIMEOUT)
@@ -117,7 +117,7 @@ def downloader(link, name):
     print("\nDownload completed!")
 
 
-def main():
+def main() -> None:
     """Run the CLI."""
     os.system("cls" if os.name == "nt" else "clear")
     matching_anime = search_query()
