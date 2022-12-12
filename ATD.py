@@ -10,8 +10,8 @@ import requests
 
 REQUEST_TIMEOUT = 60
 
-# ===== SEARCH QUERY ===== #
-def search_query() -> tuple[dict[int, str], dict]:
+
+def search_query() -> dict[int, dict[str, str]]:
     """Receive user input;  return the corresponding search results, and the full response."""
     print("Anime to search: ")
     user_input = input()
@@ -19,38 +19,32 @@ def search_query() -> tuple[dict[int, str], dict]:
         f"https://api.animethemes.moe/search?q={user_input}", timeout=REQUEST_TIMEOUT
     ).json()
     matching_anime = {
-        i: entry["name"] for i, entry in enumerate(response["search"]["anime"])
+        i: {key: entry[key] for key in ("name", "slug")}
+        for i, entry in enumerate(response["search"]["anime"])
     }
     if not matching_anime:
         print("ERROR: anime not found")
         sys.exit()
-    return matching_anime, response
+    return matching_anime
 
 
-# ===== MAKE USER CHOOSE ANIME ===== #
-def display_anime(matching_anime_indexed: dict, json_response) -> int:
+def display_anime(matching_anime_indexed: dict[int, dict[str, str]]) -> str:
+    """Receive user input to select an entry from the search results; return its URL slug."""
     user_input = None
     while user_input not in matching_anime_indexed.keys():
         os.system("cls" if os.name == "nt" else "clear")
         print("Choose the anime (type number):")
-        for number, anime_name in matching_anime_indexed.items():
-            print(f"{number} - {anime_name}")
+        for number, anime in matching_anime_indexed.items():
+            print(f"{number} - {anime['name']}")
         try:
             user_input = int(input())
         except ValueError:
             pass
-
-    slug = json_response["search"]["anime"][user_input - 1].get("slug")
-
+    slug = matching_anime_indexed[user_input]["slug"]
     return slug
 
 
-# ===== ===== #
-
-
 # ===== GET ALL OP / ED WITH ASSOCIATED LINK ===== #
-
-
 def get_entries(slug: int) -> dict:
     response = requests.get(
         f"https://api.animethemes.moe/anime/{slug}?include=animethemes.animethemeentries.videos.audio"
@@ -160,8 +154,8 @@ def downloader(link, name):
 
 def main():
     os.system("cls" if os.name == "nt" else "clear")
-    matching_anime, json_response = search_query()
-    slug = display_anime(matching_anime, json_response)
+    matching_anime = search_query()
+    slug = display_anime(matching_anime)
     entries = get_entries(slug)
     link_to_download, file_name = display_videos(entries)
     downloader(link_to_download, file_name)
