@@ -111,8 +111,8 @@ def downloader(link: str, name: str) -> None:
             if chunk:
                 f.write(chunk)
                 downloaded += len(chunk)
-                done = 100 * downloaded / total_length
-                sys.stdout.write(f"\rDownloading... {done:3.2f}%")
+                done = downloaded / total_length
+                sys.stdout.write(f"\rDownloading... {done:>7.2%}")
 
     print("\nDownload completed!")
 
