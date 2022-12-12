@@ -21,7 +21,7 @@ def search_query() -> dict[int, dict[str, str]]:
     ).json()
     matching_anime = {
         i: {key: entry[key] for key in ("name", "slug")}
-        for i, entry in enumerate(response["search"]["anime"])
+        for i, entry in enumerate(response["search"]["anime"], start=1)
     }
     if not matching_anime:
         print("ERROR: anime not found")
@@ -59,7 +59,7 @@ def get_entries(slug: str) -> dict:
             "video-link": entry["animethemeentries"][0]["videos"][0]["link"],
             "audio-link": entry["animethemeentries"][0]["videos"][0]["audio"]["link"],
         }
-        for i, entry in enumerate(response["anime"]["animethemes"])
+        for i, entry in enumerate(response["anime"]["animethemes"], start=1)
     }
     return entries
 
@@ -93,7 +93,7 @@ def display_videos(videos: dict[int, dict[str, str]]) -> tuple[str, str]:
             pass
 
     link_to_download = videos[user_input][
-        "video-link" if user_input == 1 else "audio-link"
+        "video-link" if video_audio_choice == 1 else "audio-link"
     ]
 
     return link_to_download, file_name
