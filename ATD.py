@@ -9,6 +9,7 @@ import sys
 import requests
 
 REQUEST_TIMEOUT = 60
+CHUNK_SIZE = 1024 * 1024
 
 
 def search_query() -> dict[int, dict[str, str]]:
@@ -98,37 +99,32 @@ def display_videos(videos: dict[int, dict[str, str]]) -> tuple[str, str]:
     return link_to_download, file_name
 
 
-# ===== DOWNLOAD ===== #
-
-
 def downloader(link, name):
+    """Download the selected link."""
     extension = link.split(".")[-1]
-    r = requests.get(link, stream=True)
+    response = requests.get(link, stream=True, timeout=REQUEST_TIMEOUT)
     os.system("cls" if os.name == "nt" else "clear")
-    print("Downloading...")
-
+    total_length = int(response.headers.get("content-length"))
+    downloaded = 0
     with open(f"{name}.{extension}", "wb") as f:
-        for chunk in r.iter_content(chunk_size=1024 * 1024):
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             if chunk:
                 f.write(chunk)
+                downloaded += len(chunk)
+                done = 100 * downloaded / total_length
+                sys.stdout.write(f"\rDownloading... {done:3.2f}%")
 
-    print("Finished download")
-
-
-# ===== ===== #
+    print("\nDownload completed!")
 
 
 def main():
+    """Run the CLI."""
     os.system("cls" if os.name == "nt" else "clear")
     matching_anime = search_query()
     slug = display_anime(matching_anime)
     entries = get_entries(slug)
     link_to_download, file_name = display_videos(entries)
     downloader(link_to_download, file_name)
-
-
-def dev():
-    pass
 
 
 if __name__ == "__main__":
