@@ -14,7 +14,7 @@ CHUNK_SIZE = 1024 * 1024
 
 def search_query() -> dict[int, dict[str, str]]:
     """Receive user input;  return the corresponding search results, and the full response."""
-    print("Anime to search: ")
+    print("==========\nAnime to search:\n")
     user_input = input()
     response = requests.get(
         f"https://api.animethemes.moe/search?q={user_input}", timeout=REQUEST_TIMEOUT
@@ -24,7 +24,7 @@ def search_query() -> dict[int, dict[str, str]]:
         for i, entry in enumerate(response["search"]["anime"], start=1)
     }
     if not matching_anime:
-        print("ERROR: anime not found")
+        print("==========\nERROR: anime not found")
         sys.exit()
     return matching_anime
 
@@ -34,9 +34,10 @@ def display_anime(matching_anime_indexed: dict[int, dict[str, str]]) -> str:
     user_input = None
     while user_input not in matching_anime_indexed.keys():
         os.system("cls" if os.name == "nt" else "clear")
-        print("Choose the anime (type number):")
+        print("==========\nChoose the anime:\n")
         for number, anime in matching_anime_indexed.items():
             print(f"{number} - {anime['name']}")
+        print("")
         try:
             user_input = int(input())
         except ValueError:
@@ -69,13 +70,14 @@ def display_videos(videos: dict[int, dict[str, str]]) -> tuple[str, str]:
     user_input = None
     while user_input not in videos.keys():
         os.system("cls" if os.name == "nt" else "clear")
+        print("==========")
         for number, entry in videos.items():
             print(f"{number} - {entry['name']}")
             for name, link in entry.items():
                 if name != "name":
                     print(f"{name}: {link}")
-            print("=====")
-        print("\n\nEnter which entry you want to download (number):")
+            print("")
+        print("\nEnter which entry you want to download:\n")
         try:
             user_input = int(input())
         except ValueError:
@@ -85,8 +87,8 @@ def display_videos(videos: dict[int, dict[str, str]]) -> tuple[str, str]:
     video_audio_choice = None
     while video_audio_choice not in (1, 2):
         os.system("cls" if os.name == "nt" else "clear")
-        print(f"{file_name}")
-        print("1 - Video\n2 - Only audio")
+        print(f"==========\n{file_name}\n")
+        print("1 - Video\n2 - Only audio\n")
         try:
             video_audio_choice = int(input())
         except ValueError:
